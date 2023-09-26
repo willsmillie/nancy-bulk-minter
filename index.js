@@ -7,7 +7,17 @@ const ora = require("ora");
 // Use the api keys by providing the strings directly
 const pinataSDK = require("@pinata/sdk");
 
-const { PINATA_API_SECRET, PINATA_API_KEY, CSV_FILE_PATH } = process.env;
+const {
+  PINATA_API_SECRET,
+  PINATA_API_KEY,
+  CSV_FILE_PATH,
+  NFT_ROYALTY,
+  NFT_NAME,
+  NFT_ARTIST,
+  NFT_THUMBNAIL,
+  NFT_DESCRIPTION,
+  NFT_COLLECTION,
+} = process.env;
 
 const pinata = new pinataSDK(PINATA_API_KEY, PINATA_API_SECRET);
 const csvFilePath = CSV_FILE_PATH;
@@ -56,7 +66,10 @@ async function run() {
   const pinStatuses = [];
 
   for (const nftPath of nftPaths) {
-    const res = await pinFromFS(nftPath);
+    // const name = path.basename(nftPath);
+    // const res = await pinFromFS(nftPath);
+    const row = await getRowById(csvFilePath, nftPath);
+    const metadata = metadataForNFTCID(row, res.IpfsHash);
     pinStatuses.push(res);
   }
 
@@ -128,6 +141,18 @@ function getRowById(filePath, idToFind) {
         reject(error);
       });
   });
+}
+
+function metadataForNFTCID(NFT, CID) {
+  return {
+    description: NFT_DESCRIPTION, // describe nft
+    image: `ipfs://${CID}/${NFT_THUMBNAIL}`, // thumbnail is subpath of the uploaded folter
+    animation_url: `ipfs://${CID}`, // interactive nft param
+    name: NFT_NAME, // name of the NFT
+    artist: NFT_ARTIST, // creator of the NFT
+    royalty_percentage: NFT_ROYALTY,
+    collection_metadata: NFT_COLLECTION,
+  };
 }
 
 run();
