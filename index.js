@@ -1,13 +1,16 @@
 require("dotenv").config();
 const fs = require("fs-extra");
 const path = require("path");
+const csv = require("csv-parser");
 const { Select, NumberPrompt } = require("enquirer");
 const ora = require("ora");
 // Use the api keys by providing the strings directly
 const pinataSDK = require("@pinata/sdk");
 
-const { PINATA_API_SECRET, PINATA_API_KEY } = process.env;
+const { PINATA_API_SECRET, PINATA_API_KEY, CSV_FILE_PATH } = process.env;
+
 const pinata = new pinataSDK(PINATA_API_KEY, PINATA_API_SECRET);
+const csvFilePath = CSV_FILE_PATH;
 
 const logo = `
                   .........:..                    
@@ -100,6 +103,31 @@ async function pinFromFS(dir) {
   spinner.succeed(`✅ pinned ${name}`);
 
   return res;
+}
+
+// Get metadata from the CSV file defined in the .env file
+function getRowById(filePath, idToFind) {
+  return new Promise((resolve, reject) => {
+    const results = [];
+
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on("data", (row) => {
+        results.push(row);
+      })
+      .on("end", () => {
+        const foundRow = results.find((row) => row.ID === idToFind);
+
+        if (foundRow) {
+          resolve(foundRow);
+        } else {
+          reject(new Error(`Row with ID ${idToFind} not found`));
+        }
+      })
+      .on("error", (error) => {
+        reject(error);
+      });
+  });
 }
 
 run();
