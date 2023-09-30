@@ -400,7 +400,7 @@ function metadataForNFTCID(NFT, CID) {
     image: `ipfs://${CID}/${NFT_THUMBNAIL}`, // thumbnail is subpath of the uploaded folter
     animation_url: `ipfs://${CID}`, // interactive nft param
     name: `PXL NANCY ${NFT.ID}`, // name of the NFT
-    royalty_percentage: NFT_ROYALTY,
+    royalty_percentage: Number(NFT_ROYALTY),
     collection_metadata: NFT_COLLECTION,
     ...generateNFTAttributes(NFT),
   };
