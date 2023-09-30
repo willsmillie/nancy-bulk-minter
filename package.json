@@ -1,7 +1,9 @@
 {
   "type": "commonjs",
   "dependencies": {
+    "@loopring-web/loopring-sdk": "^2.0.12",
     "@pinata/sdk": "^2.1.0",
+    "console.mute": "^0.3.0",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.3.1",
     "enquirer": "^2.4.1",
@@ -9,12 +11,14 @@
     "fs-extra": "^11.1.1",
     "node-fetch": "^3.3.2",
     "ora": "5.4.1",
-    "path": "^0.12.7"
+    "os": "^0.1.2",
+    "path": "^0.12.7",
+    "truffle-privatekey-provider": "^1.5.0",
+    "web3": "^1.7.3"
   },
   "name": "scrape-cids",
   "version": "1.0.0",
   "main": "scrape-cids.js",
-  "devDependencies": {},
   "scripts": {
     "start": "node ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
