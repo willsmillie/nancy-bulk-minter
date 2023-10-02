@@ -255,6 +255,7 @@ async function pinFoldersInDir(dir) {
       status.content_code = error.code;
       status.content_message = error.message;
       spinner.fail(`❌ Failed to pin ${name} content: ${error.message}`);
+      process.exit();
     }
 
     let metadataCid = null;
@@ -273,6 +274,7 @@ async function pinFoldersInDir(dir) {
       status.metadata_code = error.code;
       status.metadata_message = error.message;
       spinner.fail(`❌ Failed to pin ${name} metadata: ${error.message}`);
+      process.exit();
     }
 
     spinner.stop();
@@ -335,7 +337,9 @@ async function foldersInDirectory(assetsDir) {
 
 // Pin directory to IPFS via pinata
 async function pinFromFS(dir) {
+  console.log("PINNING DIR: ", dir);
   const name = path.basename(dir);
+  console.log("NAME: ", name);
 
   const options = {
     pinataMetadata: {
