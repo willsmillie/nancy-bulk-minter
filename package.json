@@ -2,7 +2,7 @@
   "type": "commonjs",
   "dependencies": {
     "@loopring-web/loopring-sdk": "^2.0.12",
-    "@pinata/sdk": "^2.1.0",
+    "@pinata/sdk": "1.2.1",
     "console.mute": "^0.3.0",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.3.1",
