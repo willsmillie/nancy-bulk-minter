@@ -254,7 +254,7 @@ async function pinFoldersInDir(dir) {
       status.content_status = "error";
       status.content_code = error.code;
       status.content_message = error.message;
-      spinner.fail(`❌ Failed to pin ${name} content: ${error.message}`);
+      spinner.fail(`❌ Failed to pin ${name} content: ${error.message}`, error);
       process.exit();
     }
 
@@ -273,7 +273,10 @@ async function pinFoldersInDir(dir) {
       status.metadata_status = "error";
       status.metadata_code = error.code;
       status.metadata_message = error.message;
-      spinner.fail(`❌ Failed to pin ${name} metadata: ${error.message}`);
+      spinner.fail(
+        `❌ Failed to pin ${name} metadata: ${error.message}`,
+        error
+      );
       process.exit();
     }
 
