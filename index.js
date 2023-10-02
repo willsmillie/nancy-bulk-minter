@@ -238,7 +238,7 @@ async function pinFoldersInDir(dir) {
   const pinStatuses = [];
 
   for (const [i, nftPath] of nftPaths.entries()) {
-    const name = path.basename(nftPath);
+    const name = nameForDir(nftPath);
     const spinner = ora(`📌 pinning ${name} (content & metadata)\n`).start();
 
     const status = { name: `${NFT_NAME} ${i}`, path: name };
@@ -335,11 +335,17 @@ async function foldersInDirectory(assetsDir) {
   return results;
 }
 
+function nameForDir(dir) {
+  // Find the last occurrence of "/" in the path
+  const lastIndex = dir.lastIndexOf("/");
+
+  // Use slice to extract the part after the last "/"
+  return dir.slice(lastIndex + 1);
+}
+
 // Pin directory to IPFS via pinata
 async function pinFromFS(dir) {
-  console.log("PINNING DIR: ", dir);
-  const name = path.basename(dir);
-  console.log("NAME: ", name);
+  const name = nameForDir(dir);
 
   const options = {
     pinataMetadata: {
