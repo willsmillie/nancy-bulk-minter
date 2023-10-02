@@ -352,7 +352,7 @@ async function pinFromFS(dir) {
 
   const options = {
     pinataMetadata: {
-      name: name,
+      name: `${NFT_NAME}-${name}-webapp`,
     },
     pinataOptions: {
       cidVersion: 0,
