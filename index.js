@@ -18,6 +18,7 @@ const {
   generateNFTAttributes,
   pinFromJSON,
   pinFromFS,
+  idForPath,
 } = require("./utils");
 
 const { CSV_FILE_PATH, NFT_ROYALTY, NFT_NAME } = process.env;
@@ -97,7 +98,12 @@ async function mintCollection() {
     nftTokenAddress,
   });
 
-  const metadataCids = await readCSVFile("./pin-log.csv");
+  const metadataCids = await readCSVFile("./pin-log.csv")
+    .then((data) => data.map((e) => e.metadata_cid))
+    .catch((e) => {
+      console.warn(e.message);
+      return [];
+    });
 
   const proceed = new Toggle({
     message: `Mint ${metadataCids.length} NFTs? This will cost ~$${
@@ -159,7 +165,7 @@ async function pinFoldersInDir(dir) {
     const name = path.basename(nftPath);
     const spinner = ora(`📌 pinning ${name} (content & metadata)\n`).start();
 
-    const status = { name: `${NFT_NAME} ${i}`, path: name };
+    const status = { name: `${NFT_NAME} ${name}`, path: name };
 
     let folderCid = null;
     try {
@@ -180,9 +186,9 @@ async function pinFoldersInDir(dir) {
     let metadataCid = null;
     try {
       const id = idForPath(nftPath);
-      const row = await readCSVFile(`./${CSV_FILE_PATH}`).then((data) =>
-        data.find((row) => row.ID === idToFind)
-      );
+      const row = await readCSVFile(`./${CSV_FILE_PATH}`).then((data) => {
+        return data.find((row) => row.ID === id);
+      });
       const metadata = metadataForNFTCID(row, folderCid);
       const metaRes = await pinFromJSON(metadata);
 
@@ -203,7 +209,7 @@ async function pinFoldersInDir(dir) {
     pinStatuses.push(status);
   }
 
-  writeCSVFile(pinStatuses, "pin-log.csv");
+  writeCSVFile(pinStatuses, "./pin-log.csv");
 }
 
 // Determine the directories which still need to be uploaded / pinned to IPFS
@@ -221,13 +227,11 @@ async function parsePendingPaths(dir) {
   });
 
   // Read and parse the pin-log.csv file to get the processed paths.
-  let processedPaths = await readCSVFile("./pin-log.csv").then((rows) =>
-    rows
-      .filter(
-        (row) => row.content_status === "ok" && row.metadata_status === "ok"
-      )
-      .map((row) => row.path)
-  );
+  let processedPaths = pinLogData
+    .filter(
+      (row) => row.content_status === "ok" && row.metadata_status === "ok"
+    )
+    .map((row) => row.path);
 
   // Extract the numeric part from each processed path
   const numericProcessedPaths = processedPaths.map(

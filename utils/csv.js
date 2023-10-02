@@ -4,22 +4,44 @@ const csv = require("csv-parser");
 
 const readFileAsync = util.promisify(fs.readFile);
 
-function readCSVFile(filePath) {
-  return new Promise((resolve, reject) => {
-    const results = [];
+async function readCSVFile(filePath) {
+  try {
+    const fileContent = await fs.promises.readFile(filePath, {
+      encoding: "utf8",
+    });
 
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on("data", (data) => {
+    const results = [];
+    const csvData = await new Promise((resolve, reject) => {
+      // Parse the CSV data from the file content
+      const parser = csv();
+
+      parser.on("data", (data) => {
         results.push(data);
-      })
-      .on("end", () => {
+      });
+
+      parser.on("end", () => {
         resolve(results);
-      })
-      .on("error", (error) => {
+      });
+
+      parser.on("error", (error) => {
         reject(error);
       });
-  });
+
+      // Pipe the file content to the CSV parser
+      const stream = require("stream");
+      const readableStream = new stream.Readable();
+      readableStream.push(fileContent);
+      readableStream.push(null); // Signal the end of the stream
+
+      readableStream.pipe(parser);
+    });
+
+    return csvData;
+  } catch (error) {
+    // Handle any errors that occur during file reading or parsing
+    console.warn(error.message);
+    return [];
+  }
 }
 
 // convert an object to a csv string format
