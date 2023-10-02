@@ -98,25 +98,21 @@ async function mintCollection() {
     nftTokenAddress,
   });
 
-  const metadataCids = await readCSVFile("./pin-log.csv")
-    .then((data) => data.map((e) => e.metadata_cid))
-    .catch((e) => {
-      console.warn(e.message);
-      return [];
-    });
+  const { mintStatuses, pendingMintCids, pinLog } =
+    await parsePendingMintCids();
 
   const proceed = new Toggle({
-    message: `Mint ${metadataCids.length} NFTs? This will cost ~$${
-      USD_COST * metadataCids.length
+    message: `Mint ${pendingMintCids.length} NFTs? This will cost ~$${
+      USD_COST * pendingMintCids.length
     }`,
   });
 
   const shouldProceed = await proceed.run();
   if (!shouldProceed) return;
 
-  const results = [];
   // Loop thru each metadata CID & mint it
-  for (const [i, cid] of metadataCids.entries()) {
+  for (const cid of pendingMintCids) {
+    const i = pinLog.find((e) => e.metadata_cid === cid)?.path;
     const spinner = ora(`🏭 minting ${NFT_NAME} ${i}`).start();
 
     const params = {
@@ -133,17 +129,27 @@ async function mintCollection() {
 
     try {
       const mintResult = await mintNFTWithMetadataCID(params);
-      results.push({ name: `${NFT_NAME} ${i}`, ...mintResult, status: "ok" });
+      mintStatuses.push({
+        name: `${NFT_NAME} ${i}`,
+        metadata_cid: cid,
+        ...mintResult,
+        status: "ok",
+      });
       spinner.succeed(`✅ Minted ${NFT_NAME} ${i}`);
     } catch (error) {
-      results.push({ name: `${NFT_NAME} ${i}`, ...error, status: "error" });
+      mintStatuses.push({
+        name: `${NFT_NAME} ${i}`,
+        metadata_cid: cid,
+        ...error,
+        status: "error",
+      });
       spinner.fail(`❌ Error minting ${NFT_NAME} ${i}: ${error.message}`);
 
       break;
     }
   }
 
-  writeCSVFile(results, "mint-log.csv");
+  writeCSVFile(mintStatuses, "mint-log.csv");
 
   process.exit();
 }
@@ -249,6 +255,38 @@ async function parsePendingPaths(dir) {
   );
 
   return { pinStatuses, pendingPaths };
+}
+
+// Determine the nfts which still need to be minted
+async function parsePendingMintCids() {
+  const pinLog = await readCSVFile("./pin-log.csv").catch((e) => {
+    console.warn(e.message);
+    return [];
+  });
+
+  const mintStatuses = [...pinLog];
+
+  // sorting function to sort paths numerically
+  pinLog.sort((a, b) => {
+    const numA = parseInt(a.path.match(/\d+/)[0]); // Extract and parse the numeric part
+    const numB = parseInt(b.path.match(/\d+/)[0]);
+    return numA - numB; // Compare the numeric values
+  });
+
+  const metadataCids = pinLog.map((e) => e.metadata_cid);
+
+  const mintLog = await readCSVFile("./mint-log.csv").catch((e) => {
+    console.warn(e.message);
+    return [];
+  });
+  const processedMints = mintLog.map((e) => e.metadata_cid);
+
+  // Identify pending paths by comparing with the original paths
+  const pendingMintCids = metadataCids.filter((metadataCid) => {
+    return !processedMints.includes(metadataCid);
+  });
+
+  return { mintStatuses, pendingMintCids, pinLog };
 }
 
 run();
