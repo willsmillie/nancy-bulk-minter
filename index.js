@@ -185,7 +185,9 @@ async function pinFoldersInDir(dir) {
       status.content_code = error.code;
       status.content_message = error.message;
       spinner.fail(
-        `❌ Failed to pin ${name} content: ${error.message ?? error}`
+        `❌ Failed to pin ${name} content: ${
+          error.message ?? JSON.stringify(error, null, 2)
+        }`
       );
       break;
     }
