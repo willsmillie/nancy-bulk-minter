@@ -101,6 +101,19 @@ async function mintCollection() {
   const { mintStatuses, pendingMintCids, pinLog } =
     await parsePendingMintCids();
 
+  process.on("exit", (code) => {
+    console.log(`Exiting with code ${code}`);
+    writeCSVFile(mintStatuses, "./mint-log.csv");
+    // Additional log messages or cleanup can be added here
+  });
+
+  process.on("SIGINT", () => {
+    console.log("Received SIGINT (Ctrl+C)");
+    writeCSVFile(mintStatuses, "./mint-log.csv");
+    // Additional log messages or cleanup can be added here
+    process.exit(0); // Exit with code 0 (success)
+  });
+
   const proceed = new Toggle({
     message: `Mint ${pendingMintCids.length} NFTs? This will cost ~$${
       USD_COST * pendingMintCids.length
@@ -145,11 +158,9 @@ async function mintCollection() {
       });
       spinner.fail(`❌ Error minting ${NFT_NAME} ${i}: ${error.message}`);
 
-      // break;
+      break;
     }
   }
-
-  writeCSVFile(mintStatuses, "mint-log.csv");
 
   process.exit();
 }
@@ -166,7 +177,18 @@ async function pinFoldersInDir(dir) {
     );
 
   const { pinStatuses, pendingPaths } = await parsePendingPaths(dir);
+  process.on("exit", (code) => {
+    console.log(`Exiting with code ${code}`);
+    writeCSVFile(pinStatuses, "./pin-log.csv");
+    // Additional log messages or cleanup can be added here
+  });
 
+  process.on("SIGINT", () => {
+    console.log("Received SIGINT (Ctrl+C)");
+    writeCSVFile(pinStatuses, "./pin-log.csv");
+    // Additional log messages or cleanup can be added here
+    process.exit(0); // Exit with code 0 (success)
+  });
   for (const [i, nftPath] of pendingPaths.entries()) {
     const name = path.basename(nftPath);
     const spinner = ora(`📌 pinning ${name} (content & metadata)\n`).start();
