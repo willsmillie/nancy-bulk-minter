@@ -271,7 +271,12 @@ async function parsePendingMintCids() {
     return [];
   });
 
-  const mintStatuses = [...pinLog];
+  const mintLog = await readCSVFile("./mint-log.csv").catch((e) => {
+    console.warn(e.message);
+    return [];
+  });
+
+  const mintStatuses = [...mintLog];
 
   // sorting function to sort paths numerically
   pinLog.sort((a, b) => {
