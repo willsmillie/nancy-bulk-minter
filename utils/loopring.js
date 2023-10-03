@@ -15,11 +15,13 @@ const {
   NFT_THUMBNAIL,
   NFT_DESCRIPTION,
   NFT_COLLECTION,
-  CHAIN_ID,
+  CHAIN_ID: _CHAIN_ID,
   INFURA_PROJECT_ID,
   ETH_ACCOUNT_ADDRESS,
   ETH_ACCOUNT_PRIVATE_KEY,
 } = process.env;
+
+const CHAIN_ID = Number(_CHAIN_ID);
 
 // initialize ETH provider via infura & private key
 const provider = new PrivateKeyProvider(

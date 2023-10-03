@@ -210,7 +210,9 @@ async function pinFoldersInDir(dir) {
       status.metadata_code = error.code;
       status.metadata_message = error.message;
       spinner.fail(
-        `❌ Failed to pin ${name} metadata: ${error.message ?? error}`
+        `❌ Failed to pin ${name} metadata: ${
+          error.message ?? JSON.stringify(error, null, 2)
+        }`
       );
 
       break;
