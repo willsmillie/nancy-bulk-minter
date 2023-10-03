@@ -287,10 +287,6 @@ async function parsePendingMintCids() {
 
   const metadataCids = pinLog.map((e) => e.metadata_cid);
 
-  const mintLog = await readCSVFile("./mint-log.csv").catch((e) => {
-    console.warn(e.message);
-    return [];
-  });
   const processedMints = mintLog.map((e) => e.metadata_cid);
 
   // Identify pending paths by comparing with the original paths
