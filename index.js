@@ -158,7 +158,7 @@ async function mintCollection() {
       });
       spinner.fail(`❌ Error minting ${NFT_NAME} ${i}: ${error.message}`);
 
-      break;
+      // break;
     }
   }
 
