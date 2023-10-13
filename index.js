@@ -142,7 +142,7 @@ async function mintCollection() {
 
   // Loop thru each metadata CID & mint it
   for (const cid of pendingMintCids) {
-    const i = pinLog.find((e) => e.metadata_cid === cid)?.path;
+    const i = idForPath(pinLog.find((e) => e.metadata_cid === cid)?.path);
     const spinner = ora(`🏭 minting ${NFT_NAME} ${i}`).start();
 
     const params = {
