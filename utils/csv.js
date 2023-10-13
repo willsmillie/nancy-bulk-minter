@@ -53,6 +53,7 @@ function convertToCSV(jsonData) {
 
 // write an object to a csv file
 function writeCSVFile(data, path) {
+  if (data.length === 0) return;
   const csvData = convertToCSV(data);
   fs.writeFileSync(path, csvData);
 }

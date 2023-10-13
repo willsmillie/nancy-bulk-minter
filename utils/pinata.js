@@ -16,12 +16,12 @@ const {
 const pinata = new pinataSDK(PINATA_API_KEY, PINATA_API_SECRET);
 
 // generate metadata for a specific NFT
-function metadataForNFTCID(NFT, CID) {
+function metadataForNFTCID(NFT, CID, THUMB) {
   return {
     description: NFT_DESCRIPTION, // describe nft
-    image: `ipfs://${CID}/${NFT_THUMBNAIL}`, // thumbnail is subpath of the uploaded folter
+    image: `ipfs://${THUMB}`, // thumbnail is subpath of the uploaded folter
     animation_url: `ipfs://${CID}`, // interactive nft param
-    name: `${NFT_NAME} ${NFT.ID}`, // name of the NFT
+    name: `${NFT_NAME} #${NFT.ID}`, // name of the NFT
     royalty_percentage: Number(NFT_ROYALTY),
     collection_metadata: NFT_COLLECTION,
     ...generateNFTAttributes(NFT),
@@ -31,15 +31,14 @@ function metadataForNFTCID(NFT, CID) {
 // assemble attributes for a specific NFT
 function generateNFTAttributes(nftProperties) {
   const keys = [
-    "ID",
+    // "ID",
     "BACKGROUND",
-    "BODY",
-    "TATTOO",
     "FACE",
-    "SHIRT",
-    "JACKET",
-    "EYES",
+    "UPGRADE",
+    "OUTFIT",
     "HEAD",
+    "EYEWEAR",
+    "HAND",
   ];
 
   const attributes = [];
@@ -64,7 +63,7 @@ async function pinFromFS(dir) {
 
   const options = {
     pinataMetadata: {
-      name: `${NFT_NAME}-${name}-webapp`,
+      name: `${NFT_NAME}-${name}`,
     },
     pinataOptions: {
       cidVersion: 0,

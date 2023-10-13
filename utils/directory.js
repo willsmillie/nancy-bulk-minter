@@ -49,15 +49,36 @@ async function foldersInDirectory(assetsDir) {
   return results;
 }
 
+// Get an array of files within the passed directory
+async function filesInDirectory(directory) {
+  const results = [];
+
+  // Get the list of items (files and directories) in the specified directory
+  const items = await fs.readdir(directory);
+
+  for (const item of items) {
+    const itemPath = path.join(directory, item);
+
+    // Check if the item is a file
+    const stats = await fs.stat(itemPath);
+    if (stats.isFile() && !item.startsWith(".")) {
+      results.push(itemPath);
+    }
+  }
+
+  return results;
+}
+
 function idForPath(dir) {
-  const regex = /(\d+)$/;
+  const regex = /\d+/g;
   const match = dir.match(regex);
-  return match ? match[1] : null;
+  return match ? match[0] : null;
 }
 
 module.exports = {
   promptPath,
   resolveTildePath,
   foldersInDirectory,
+  filesInDirectory,
   idForPath,
 };
