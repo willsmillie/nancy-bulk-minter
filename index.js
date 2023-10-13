@@ -116,6 +116,7 @@ async function mintCollection() {
 
   const { mintStatuses, pendingMintCids, pinLog } =
     await parsePendingMintCids();
+  console.log(pinLog.map((e) => e.name));
 
   process.on("exit", (code) => {
     console.log(`Exiting with code ${code}`);
@@ -466,8 +467,8 @@ async function parsePendingMintCids() {
 
   // sorting function to sort paths numerically
   pinLog.sort((a, b) => {
-    const numA = parseInt(a.path.match(/\d+/)[0]); // Extract and parse the numeric part
-    const numB = parseInt(b.path.match(/\d+/)[0]);
+    const numA = parseInt(idForPath(a.path)); // Ensure a default value for non-numeric cases
+    const numB = parseInt(idForPath(b.path));
     return numA - numB; // Compare the numeric values
   });
 
