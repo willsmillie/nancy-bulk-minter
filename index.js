@@ -467,8 +467,8 @@ async function parsePendingMintCids() {
 
   // sorting function to sort paths numerically
   pinLog.sort((a, b) => {
-    const numA = parseInt(idForPath(a.path)); // Ensure a default value for non-numeric cases
-    const numB = parseInt(idForPath(b.path));
+    const numA = parseInt(idForPath(a.name)); // Ensure a default value for non-numeric cases
+    const numB = parseInt(idForPath(b.name));
     return numA - numB; // Compare the numeric values
   });
 
